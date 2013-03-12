@@ -17,6 +17,9 @@ import qualified Data.Map as M
 
 import System.Environment (getEnvironment)
 
+import XMonad.Actions.PhysicalScreens
+
+
 -- $usage
 -- To use this module, start with the following @~\/.xmonad\/xmonad.hs@:
 --
@@ -28,13 +31,21 @@ import System.Environment (getEnvironment)
 -- For examples of how to further customize @mateConfig@ see "XMonad.Config.Desktop".
 
 mateConfig = desktopConfig
-    { terminal = "mate-terminal"
+    { terminal = "terminator"
     , keys     = mateKeys <+> keys desktopConfig
     , startupHook = mateRegister >> startupHook desktopConfig }
 
 mateKeys (XConfig {modMask = modm}) = M.fromList $
     [ ((modm, xK_p), mateRun)
-    , ((modm .|. shiftMask, xK_q), spawn "mate-session-save --kill") ]
+--    , ((modm .|. shiftMask, xK_q), spawn "mate-session-save --kill")
+--    , ((modMask, xK_a), onPrevNeighbour W.view)
+--    , ((modMask, xK_o), onNextNeighbour W.view)
+--    , ((modMask .|. shiftMask, xK_a), onPrevNeighbour W.shift)
+--    , ((modMask .|. shiftMask, xK_o), onNextNeighbour W.shift)
+ ] ++
+     [((modm .|. mask, key), f sc)
+     | (key, sc) <- zip [xK_q, xK_w, xK_e] [0..]
+     , (f, mask) <- [(viewScreen, 0), (sendToScreen, shiftMask)]]
 
 -- | Launch the "Run Application" dialog.  mate-panel must be running for this
 -- to work.
@@ -71,6 +82,7 @@ mateRegister = io $ do
 
 -- end of inlined mateConfig
 
+
 -- here we actually configure xmonad
-main = xmonad mateConfig
+main = xmonad mateConfig 
 
